@@ -6,7 +6,9 @@
         recipient: principal,
         message: (string-utf8 500),
         unlock-height: uint,
-        is-revealed: bool
+        is-revealed: bool,
+        is-encrypted: bool,
+        reward: uint
     }
 )
 
@@ -17,14 +19,17 @@
 (define-constant err-not-unlocked-yet (err u101))
 (define-constant err-not-recipient (err u102))
 (define-constant err-message-not-found (err u103))
+(define-constant err-insufficient-funds (err u104))
 
 ;; Store a new message
-(define-public (store-message (recipient principal) (message (string-utf8 500)) (blocks-until-unlock uint))
+(define-public (store-message (recipient principal) (message (string-utf8 500)) (blocks-until-unlock uint) (is-encrypted bool) (reward uint))
     (let 
         (
             (message-id (var-get message-counter))
             (unlock-height (+ block-height blocks-until-unlock))
         )
+        (asserts! (>= (stx-get-balance tx-sender) reward) err-insufficient-funds)
+        
         (map-insert messages
             { message-id: message-id }
             {
@@ -32,10 +37,16 @@
                 recipient: recipient,
                 message: message,
                 unlock-height: unlock-height,
-                is-revealed: false
+                is-revealed: false,
+                is-encrypted: is-encrypted,
+                reward: reward
             }
         )
         (var-set message-counter (+ message-id u1))
+        (if (> reward u0)
+            (stx-transfer? reward tx-sender (as-contract tx-sender))
+            (ok true)
+        )
         (ok message-id)
     )
 )
@@ -53,6 +64,13 @@
             { message-id: message-id }
             (merge message { is-revealed: true })
         )
+
+        ;; Transfer reward if any
+        (if (> (get reward message) u0)
+            (stx-transfer? (get reward message) (as-contract tx-sender) tx-sender)
+            (ok true)
+        )
+        
         (ok (get message message))
     )
 )
