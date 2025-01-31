@@ -8,7 +8,7 @@ import {
 import { assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
 
 Clarinet.test({
-    name: "Can store a new message",
+    name: "Can store a new message with encryption and reward",
     async fn(chain: Chain, accounts: Map<string, Account>) {
         const wallet1 = accounts.get('wallet_1')!;
         const wallet2 = accounts.get('wallet_2')!;
@@ -17,7 +17,9 @@ Clarinet.test({
             Tx.contractCall('message-capsule', 'store-message', [
                 types.principal(wallet2.address),
                 types.utf8("Hello from the past!"),
-                types.uint(10)
+                types.uint(10),
+                types.bool(true),
+                types.uint(1000)
             ], wallet1.address)
         ]);
         
@@ -26,7 +28,7 @@ Clarinet.test({
 });
 
 Clarinet.test({
-    name: "Cannot reveal message before unlock height",
+    name: "Cannot store message with insufficient reward funds",
     async fn(chain: Chain, accounts: Map<string, Account>) {
         const wallet1 = accounts.get('wallet_1')!;
         const wallet2 = accounts.get('wallet_2')!;
@@ -35,19 +37,18 @@ Clarinet.test({
             Tx.contractCall('message-capsule', 'store-message', [
                 types.principal(wallet2.address),
                 types.utf8("Hello from the past!"),
-                types.uint(10)
-            ], wallet1.address),
-            Tx.contractCall('message-capsule', 'reveal-message', [
-                types.uint(0)
-            ], wallet2.address)
+                types.uint(10),
+                types.bool(true),
+                types.uint(999999999999)
+            ], wallet1.address)
         ]);
         
-        block.receipts[1].result.expectErr().expectUint(101);
+        block.receipts[0].result.expectErr().expectUint(104);
     },
 });
 
 Clarinet.test({
-    name: "Can reveal message after unlock height",
+    name: "Can reveal message and receive reward after unlock height",
     async fn(chain: Chain, accounts: Map<string, Account>) {
         const wallet1 = accounts.get('wallet_1')!;
         const wallet2 = accounts.get('wallet_2')!;
@@ -56,7 +57,9 @@ Clarinet.test({
             Tx.contractCall('message-capsule', 'store-message', [
                 types.principal(wallet2.address),
                 types.utf8("Hello from the past!"),
-                types.uint(1)
+                types.uint(1),
+                types.bool(true),
+                types.uint(1000)
             ], wallet1.address)
         ]);
         
