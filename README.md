@@ -7,6 +7,8 @@ A decentralized time capsule system that allows users to store messages that can
 - Store encrypted messages with a specified unlock time
 - Messages can only be revealed by the intended recipient
 - Messages can only be revealed after the specified block height is reached
+- Optional end-to-end encryption support for sensitive messages
+- STX reward system to incentivize recipients
 - Immutable record of message history
 - Transparent and verifiable delivery system
 
@@ -14,5 +16,15 @@ A decentralized time capsule system that allows users to store messages that can
 
 - Scheduled message delivery
 - Digital legacy planning
-- Time-locked announcements
+- Time-locked announcements 
 - Future-dated communications
+- Incentivized information delivery
+- Secure time-delayed communications
+
+## New Features
+
+### Message Encryption
+Messages can now be marked as encrypted, allowing for end-to-end encryption implementation by the frontend application. This enables secure storage of sensitive information.
+
+### STX Rewards
+Senders can now attach STX tokens as rewards for recipients. The rewards are held in escrow by the contract and automatically transferred to recipients upon message revelation. This creates an incentive mechanism for time-sensitive information delivery.
