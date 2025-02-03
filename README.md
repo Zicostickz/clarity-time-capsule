@@ -11,6 +11,7 @@ A decentralized time capsule system that allows users to store messages that can
 - STX reward system to incentivize recipients
 - Immutable record of message history
 - Transparent and verifiable delivery system
+- Message age tracking and timestamp information
 
 ## Use Cases
 
@@ -20,6 +21,7 @@ A decentralized time capsule system that allows users to store messages that can
 - Future-dated communications
 - Incentivized information delivery
 - Secure time-delayed communications
+- Message authenticity verification through timestamps
 
 ## New Features
 
@@ -28,3 +30,6 @@ Messages can now be marked as encrypted, allowing for end-to-end encryption impl
 
 ### STX Rewards
 Senders can now attach STX tokens as rewards for recipients. The rewards are held in escrow by the contract and automatically transferred to recipients upon message revelation. This creates an incentive mechanism for time-sensitive information delivery.
+
+### Message Timestamps
+Each message now includes a creation timestamp (block height) and supports age tracking functionality. This enables verification of message authenticity and helps track the chronological order of messages.
