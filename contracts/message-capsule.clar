@@ -8,7 +8,8 @@
         unlock-height: uint,
         is-revealed: bool,
         is-encrypted: bool,
-        reward: uint
+        reward: uint,
+        created-at: uint
     }
 )
 
@@ -39,7 +40,8 @@
                 unlock-height: unlock-height,
                 is-revealed: false,
                 is-encrypted: is-encrypted,
-                reward: reward
+                reward: reward,
+                created-at: block-height
             }
         )
         (var-set message-counter (+ message-id u1))
@@ -85,5 +87,13 @@
         (message (unwrap! (map-get? messages { message-id: message-id }) err-message-not-found))
     )
         (>= block-height (get unlock-height message))
+    )
+)
+
+(define-read-only (get-message-age (message-id uint))
+    (let (
+        (message (unwrap! (map-get? messages { message-id: message-id }) err-message-not-found))
+    )
+        (- block-height (get created-at message))
     )
 )

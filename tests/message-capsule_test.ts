@@ -74,3 +74,31 @@ Clarinet.test({
         block2.receipts[0].result.expectOk().expectAscii("Hello from the past!");
     },
 });
+
+Clarinet.test({
+    name: "Can get message age",
+    async fn(chain: Chain, accounts: Map<string, Account>) {
+        const wallet1 = accounts.get('wallet_1')!;
+        const wallet2 = accounts.get('wallet_2')!;
+        
+        let block1 = chain.mineBlock([
+            Tx.contractCall('message-capsule', 'store-message', [
+                types.principal(wallet2.address),
+                types.utf8("Hello from the past!"),
+                types.uint(10),
+                types.bool(true),
+                types.uint(1000)
+            ], wallet1.address)
+        ]);
+
+        chain.mineEmptyBlock(5);
+        
+        let block2 = chain.mineBlock([
+            Tx.contractCall('message-capsule', 'get-message-age', [
+                types.uint(0)
+            ], wallet1.address)
+        ]);
+        
+        block2.receipts[0].result.expectOk().expectUint(6);
+    },
+});
